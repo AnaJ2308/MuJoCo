@@ -1,0 +1,61 @@
+##############################################################
+# ROBOT
+##############################################################
+
+MODEL:
+
+    # robot name
+    robot_name: "g1"
+
+    # model file paths
+    xml_path: "./models/g1/g1_12dof.xml"
+    urdf_path: "./models/g1/g1_12dof.urdf"
+
+INITIAL_STATE:
+
+    # initial base position of the robot
+    px: 0.0
+    py: 0.0
+    pz: 0.78
+
+    # default joint angles
+    default_angles: [-0.2,  0.0,  0.0,  0.42, -0.23, 0.0,  # LHP, LHR, LHY, LKP, LAP, LAR,
+                     -0.2,  0.0,  0.0,  0.42, -0.23, 0.0]  # RHP, RHR, RHY, RKP, RAP, RAR
+
+##############################################################
+# SIMULATION
+##############################################################
+
+SIM:
+
+    # maximum simulation time [s]
+    t_max: 30.0       # maximum simulation time
+    
+    # rate for rendering the graphics
+    hz_render: 50.0   # GLFW render rate
+
+    # rate for control
+    hz_control: 100.0  # control update rate
+
+##############################################################
+# GAINS
+##############################################################
+
+GAINS:
+
+    # position gains
+    kps: [500, 500, 500, 550, 500, 300, 
+          500, 500, 500, 550, 500, 300]
+    
+    # velocity gains
+    kds: [15, 15, 15, 15, 15, 15, 
+          15, 15, 15, 15, 15, 15]
+
+##############################################################
+# VISUALIZATION
+##############################################################
+
+VISUALIZATION:
+
+    # see ground reaction forces
+    grf: true

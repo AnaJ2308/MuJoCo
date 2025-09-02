@@ -1,0 +1,27 @@
+Fri Aug 22 13:10:49 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 45172.5200.
+
+Fri Aug 22 14:49:15 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 72672.5900.
+
+Tue Aug 26 21:13:33 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 75064.2500.
+
+Tue Aug 26 23:16:12 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 74812.9600.
+
+Wed Aug 27 15:31:33 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 74778.8850.
+
+Thu Aug 28 18:13:49 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 45158.2100.
+
+Thu Aug 28 18:19:57 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 45158.2100.
+
+Thu Aug 28 18:22:15 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 45158.2100.
+
+Fri Aug 29 14:42:38 2025
+WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 45158.2100.
+
