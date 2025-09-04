@@ -67,7 +67,7 @@ print(f"World size: {(2*SX):.2f}m x {(2*SY):.2f}m; height range: {SZ:.2f}m; base
 # -----------------------------
 # Build minimal MuJoCo scene
 # -----------------------------
-# NOTE: nrow = image HEIGHT (H), ncol = image WIDTH (W)
+# NOTE: nrow = image HEIGHT (H), ncol = image WIDTH (W). hello. okay i am just testing my commits
 xml = f"""
 <mujoco>
   <option gravity="0 0 -9.81" integrator="RK4" timestep="0.002"/>
@@ -83,10 +83,6 @@ xml = f"""
     <!-- The terrain surface -->
     <geom type="hfield" hfield="terrain" material="mat"/>
 
-    <!-- Drop a red box so you can see scale and gravity -->
-    
-
-    <!-- Light -->
     <light pos="0 0 5" dir="0 0 -1" diffuse="1 1 1" specular="0.3 0.3 0.3"/>
   </worldbody>
 </mujoco>
