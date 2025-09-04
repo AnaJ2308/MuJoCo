@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#live demo, fake data. looks like spiky grass moving around/updating
 # Live-updating heightfield from a synthetic "point cloud" dataset (no cameras needed).
 # - Every 5 seconds, we fetch a new random point cloud that simulates camera data.
 # - We rasterize those points into an (nrow x ncol) grid using MAX z per cell.

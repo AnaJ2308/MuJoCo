@@ -1,3 +1,4 @@
+# code to visualize the PNGs on this folder, which come from the pointcloud data from heightfield_subscriber.py
 import os
 import sys
 import numpy as np

@@ -25,3 +25,15 @@ WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Ti
 Fri Aug 29 14:42:38 2025
 WARNING: Nan, Inf or huge value in QPOS at DOF 2. The simulation is unstable. Time = 45158.2100.
 
+Wed Sep  3 15:37:17 2025
+ERROR: mj_copyDataVisual: attempting to copy mjData while stack is in use
+
+Wed Sep  3 19:38:22 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 1.9450.
+
+Wed Sep  3 19:38:31 2025
+ERROR: mj_copyDataVisual: attempting to copy mjData while stack is in use
+
+Wed Sep  3 19:38:43 2025
+ERROR: mj_copyDataVisual: attempting to copy mjData while stack is in use
+

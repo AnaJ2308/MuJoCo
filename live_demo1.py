@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# live demo for heightfield with wave flow
 # Live-updating heightfield demo for MuJoCo (Python bindings)
 # Works with mujoco>=3.0.0. You'll also need GLFW (pip install glfw) on most systems.
 #

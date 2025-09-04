@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# viewer for the heightfield using real pointcloud data for the personal laptop. This code matches up with the my_launch live_subscriber
 """
 Laptop HField Viewer (TCP -> MuJoCo)
 
