@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# exactly the same as hfield_ros2_2.py except I'm trying to optimize speed in processing
+    # project_points_to_grid uses np.maximum.at which is pretty fast
 # Minimal ROS2 → MuJoCo live heightfield (single topic, no TF, no fancy filters)
 # uses camera z as the height directly, takes the max
 
@@ -44,7 +46,7 @@ def make_model_xml(nrow=NROW, ncol=NCOL, size=(Lx, Ly, Hz, base)):
   <worldbody>
     <light name="toplight" pos="0 0 5" dir="0 0 -1" diffuse="0.4 0.4 0.4" specular="0.3 0.3 0.3" directional="true"/>
     <geom type='hfield' hfield='terrain' rgba='0.7 0.7 0.7 1'/>
-    
+   
     <camera name='iso' pos='2.0 -2.5 1.8' euler='35 0 25'/>
   </worldbody>
 </mujoco>
@@ -78,11 +80,13 @@ def project_points_to_grid(points_xyz, heights01_out):
       points_xyz: (N,3) numpy array of [x,y,z]
       heights01_out: (NROW,NCOL) float32 array to overwrite (in-place)
     """
-    
+    # Precompute grid mapping constants
+    # Map x ∈ [-ROI_X_HALF, +ROI_X_HALF] → col ∈ [0, NCOL-1]
+    # Map y ∈ [-ROI_Y_HALF, +ROI_Y_HALF] → row ∈ [0, NROW-1]
     dx = (2 * ROI_X_HALF) / NCOL
     dy = (2 * ROI_Y_HALF) / NROW
 
-    # Start by filling with NaN (not a number) to later tell which cells never got any points
+    # Start by filling with NaN (not a number) to ater tell which cells never got any points
     grid_z = np.full((NROW, NCOL), np.nan, dtype=np.float32)
 
     # Filter to ROI bounds (keeps this VERY cheap)
@@ -113,27 +117,13 @@ def project_points_to_grid(points_xyz, heights01_out):
     np.clip(cols, 0, NCOL - 1, out=cols)
     np.clip(rows, 0, NROW - 1, out=rows)
 
-    # at this point we already know the 3D points that landed in which row and col grid cell
-    # now we want, for each cell, the max z of all the points that landed in that cell
-    lin = rows * NCOL + cols # create an indice that is unique per (row,col) pair. no points taken into account here
-    order = np.argsort(lin) # gives you the indices (positions) that would sort lin
-    lin_sorted = lin[order]
-    z_sorted = z[order]
+    # use Numpy's np.mazimum.at
+    lin = rows * NCOL + cols
+    flat = np.full(NROW*NCOL, Z_MIN, dtype=np.float32)
+    np.maximum.at(flat, lin, z)
+    grid_z = flat.reshape(NROW, NCOL)
 
-    # Walk runs of identical lin indices and take max
-    start = 0
-    total = lin_sorted.size
-    while start < total:
-        end = start + 1
-        idx = lin_sorted[start]
-        # advance end while same index
-        while end < total and lin_sorted[end] == idx:
-            end += 1
-        r = idx // NCOL
-        c = idx % NCOL
-        zmax = np.max(z_sorted[start:end])
-        grid_z[r, c] = zmax # grid_z has tallest z per cell for the points that hit each cell, and NaN where nothing landed.
-        start = end
+
 
     # Fill NaNs (cells with no points) with Z_MIN
     np.nan_to_num(grid_z, copy=False, nan=Z_MIN)
@@ -168,7 +158,7 @@ class PC2ToHFieldNode(Node):
         # 1) Pull xyz from pointcloud (skip NaNs)
         #   field names often include x,y,z in RealSense organized clouds
        
-    
+      
 
         gen = point_cloud2.read_points(msg, field_names=('x', 'y', 'z'), skip_nans=True) # read_points Iterates over the structured binary data inside the ROS PointCloud2 message and yields only good (x,y,z) triples.
         arr = np.fromiter(gen, dtype=[('x','<f4'), ('y','<f4'), ('z','<f4')]) # pulls values out of the iterator and builds an array from them
@@ -190,7 +180,7 @@ class PC2ToHFieldNode(Node):
             project_points_to_grid(pts, self.heights01)
             
             self.new_frame = True
-    
+        
 
 
 def main():
@@ -223,10 +213,8 @@ def main():
             mujoco.mj_step(model, data)
             if node.new_frame:
                 with lock:
-                # 3) Push into MuJoCo (CPU) and refresh GPU
                     set_heightfield(model, hid, heights01)
                     # mujoco.mj_forward(model, data)
-            # (We upload here to keep it simple; you could also set a flag and upload in the render loop)
                     upload_heightfield(v, model, hid)
                     node.new_frame = False
             v.sync()

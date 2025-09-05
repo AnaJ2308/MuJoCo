@@ -2,6 +2,7 @@
 # Minimal ROS2 → MuJoCo live heightfield (single topic, no TF, no fancy filters)
 # pip install mujoco glfw numpy
 # ROS2 Python deps: rclpy, sensor_msgs_py (comes with ROS2), sensor_msgs
+# uses the camera Y as the height directly, takes the max
 
 import os, threading, time
 import numpy as np
@@ -46,10 +47,7 @@ def make_model_xml(nrow=NROW, ncol=NCOL, size=(Lx, Ly, Hz, base)):
   <worldbody>
     <light name="toplight" pos="0 0 5" dir="0 0 -1" diffuse="0.4 0.4 0.4" specular="0.3 0.3 0.3" directional="true"/>
     <geom type='hfield' hfield='terrain' rgba='0.7 0.7 0.7 1'/>
-    <body pos='-1.0 0 {base_ + 0.4}'>
-      <freejoint/>
-      <geom type='sphere' size='0.07' density='2000' rgba='0.9 0.2 0.2 1'/>
-    </body>
+    
     <camera name='iso' pos='2.0 -2.5 1.8' euler='35 0 25'/>
   </worldbody>
 </mujoco>
@@ -150,7 +148,7 @@ def project_points_to_grid(points_xyz, heights01_out):
     H_MAX = float(max(H_MAX, 1e-3))
     grid_h /= H_MAX
     
-    np.clip(grid_h, 0.0, 1.0, out=grid_h)
+    # np.clip(grid_h, 0.0, 1.0, out=grid_h)
 
     # Write into output buffer (no reallocation)
     heights01_out[:] = grid_h
@@ -194,12 +192,7 @@ class PC2ToHFieldNode(Node):
         # 2) Project to grid (edit heights01 in place)
         with self.lock:
             project_points_to_grid(pts, self.heights01)
-            # 3) Push into MuJoCo (CPU) and refresh GPU
-            set_heightfield(self.model, self.hid, self.heights01)
-            mujoco.mj_forward(self.model, self.data)
-            # (We upload here to keep it simple; you could also set a flag and upload in the render loop)
-            if self.viewer is not None:
-                upload_heightfield(self.viewer, self.model, self.hid)
+            
             self.new_frame = True
 
 
@@ -231,6 +224,13 @@ def main():
         # Render loop (just steps physics at an idle rate)
         while v.is_running():
             mujoco.mj_step(model, data)
+            if node.new_frame:
+                with  lock: 
+                # 3) Push into MuJoCo (CPU) and refresh GPU
+                    set_heightfield(model, hid, heights01)
+                    # mujoco.mj_forward(model, data)
+                    upload_heightfield(v, model, hid)
+                    node.new_frame = False
             v.sync()
             # Small sleep keeps CPU happy
             time.sleep(0.002)
